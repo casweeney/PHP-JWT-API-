@@ -5,3 +5,5 @@ JWT.php was downloaded from https://github.com/firebase/php-jwt
 
 Tutorial Videos used:
 https://www.youtube.com/playlist?list=PLCakfctNSHkGQ6S557u-6sLEYsfWje47P
+
+Testing tool used: Postman Desktop App or Postman Chrome App
