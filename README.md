@@ -1,5 +1,5 @@
 # PHP-JWT-API-
-PHP API developed using JSON Web Token (JWT) for Authentication.
+### PHP API developed using JSON Web Token (JWT) for Authentication.
 
 JWT.php was downloaded from https://github.com/firebase/php-jwt
 
