@@ -20,6 +20,20 @@
 			if(!is_array($user)){
 				$this->returnResponse(INVALID_USER_PASS, 'Email or Passord is incorrect.');
 			}
+
+			if($user['active'] == 0) {
+				$this->returnResponse(USER_NOT_ACTIVE, 'User is not activated. Please contact your admin.');
+			}
+
+			$paylod = [
+				'iat' => time(),
+				'iss' => 'localhost',
+				'exp' => time() + (60),
+				'userId' => $user['id']
+			];
+			
+			$token = JWT::encode($paylod, SECRETE_KEY);
+			echo $token;
 		}
 	}
 ?>
