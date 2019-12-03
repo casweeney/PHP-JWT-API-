@@ -1,11 +1,8 @@
 <?php
 	class Api extends Rest {
-		public $dbConn;
 
 		public function __construct() {
 			parent::__construct();
-			$db = new DbConnect;
-			$this->dbConn = $db->connect();
 		}
 
 		public function generateToken() {
@@ -53,43 +50,43 @@
 			$addr = $this->validateParameter('addr', $this->param['addr'], STRING, false);
 			$mobile = $this->validateParameter('mobile', $this->param['mobile'], STRING, false);
 
-			try {
-				$token = $this->getBearerToken();
-				$payload = JWT::decode($token, SECRETE_KEY, ['HS256']);
+			$cust = new Customer;
+			$cust->setName($name);
+			$cust->setEmail($email);
+			$cust->setAddress($addr);
+			$cust->setMobile($mobile);
+			$cust->setCreatedBy($payload->userId);
+			$cust->setCreatedOn(date('Y-m-d'));
 
-				$stmt = $this->dbConn->prepare("SELECT * FROM users WHERE id = :userId");
-				$stmt->bindParam(":userId", $payload->userId);
-				$stmt->execute();
-
-				$user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-				if(!is_array($user)){
-					$this->returnResponse(INVALID_USER_PASS, 'This user is not found in our database.');
-				}
-
-				if($user['active'] == 0) {
-					$this->returnResponse(USER_NOT_ACTIVE, 'This user may be deactivated. Please contact your admin.');
-				}
-
-				$cust = new Customer;
-				$cust->setName($name);
-				$cust->setEmail($email);
-				$cust->setAddress($addr);
-				$cust->setMobile($mobile);
-				$cust->setCreatedBy($payload->userId);
-				$cust->setCreatedOn(date('Y-m-d'));
-
-				if(!$cust->insert()){
-					$message = 'Failed to insert.';
-				} else {
-					$message = 'Inserted successfully.';
-				}
-
-				$this->returnResponse(SUCCESS_RESPONSE, $message);
-
-			} catch (Exception $e) {
-				$this->throwError(ACCESS_TOKEN_ERRORS, $e->getMessage());
+			if(!$cust->insert()){
+				$message = 'Failed to insert.';
+			} else {
+				$message = 'Inserted successfully.';
 			}
+
+			$this->returnResponse(SUCCESS_RESPONSE, $message);
+		}
+
+		public function getCustomerDetails() {
+			$customerId = $this->validateParameter('customerId', $this->param['customerId'], INTEGER);
+
+			$cust = new Customer;
+			$cust->setId($customerId);
+			$customer = $cust->getCustomerDetailsById();
+
+			if(!is_array($customer)){
+				$this->returnResponse(SUCCESS_RESPONSE, ['message' => 'Customer details not found.']);
+			}
+
+			$response['customerId']        = $customer['id'];
+			$response['customerName']      = $customer['name'];
+			$response['email']             = $customer['email'];
+			$response['mobile']            = $customer['mobile'];
+			$response['address']           = $customer['address'];
+			$response['createdBy']         = $customer['created_user'];
+			$response['lastUpdatedBy']     = $customer['updated_user'];
+
+			$this->returnResponse(SUCCESS_RESPONSE, $response);
 		}
 	}
 ?>
