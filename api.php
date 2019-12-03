@@ -95,7 +95,7 @@
 			$name = $this->validateParameter('name', $this->param['name'], STRING, false);
 			$addr = $this->validateParameter('addr', $this->param['addr'], STRING, false);
 			$mobile = $this->validateParameter('mobile', $this->param['mobile'], INTEGER, false);
-			
+
 			$cust = new Customer;
 			$cust->setId($customerId);
 			$cust->setName($name);
@@ -107,6 +107,19 @@
 				$message = 'Failed to update.';
 			} else {
 				$message = "Updated successfully.";
+			}
+			$this->returnResponse(SUCCESS_RESPONSE, $message);
+		}
+
+
+		public function deleteCustomer() {
+			$customerId = $this->validateParameter('customerId', $this->param['customerId'], INTEGER);
+			$cust = new Customer;
+			$cust->setId($customerId);
+			if(!$cust->delete()) {
+				$message = 'Failed to delete.';
+			} else {
+				$message = "deleted successfully.";
 			}
 			$this->returnResponse(SUCCESS_RESPONSE, $message);
 		}
